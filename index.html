@@ -154,7 +154,7 @@
       font-weight: 900;
       color: #8b5cf6;
       min-height: 65px;
-      transition: opacity 0.5s;
+      transition: opacity 0.3s;
     }
 
     .target-word.hidden {
@@ -330,12 +330,19 @@
     missCount = 0;
     document.getElementById('hint-text').innerText = "";
     updateInputDisplay();
-    clearTimeout(hideTimer);
+
+    // 動いているタイマーを完全に止める
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
 
     if (filteredList.length === 0) return;
 
     const q = filteredList[currentWordIndex];
     const targetEl = document.getElementById('target-text');
+    
+    // 表示状態を強制リセット（必ず可視化）
     targetEl.classList.remove('hidden');
 
     if (currentMode === 'spell') {
@@ -344,13 +351,13 @@
       targetEl.innerText = q.en;
       speak(q.en);
 
-      // えいご おぼえモードのみ 2秒で非表示
+      // えいご おぼえモードの時だけ 2秒後に隠す
       hideTimer = setTimeout(() => {
         targetEl.classList.add('hidden');
       }, 2000);
 
     } else {
-      // ローマじモード：日本語（意味）非表示 ＆ 単語はずっと表示！
+      // ローマじモード：日本語は非表示＆単語は「消さずにずっと表示」！
       document.getElementById('ja-text').innerText = "";
       targetAnswer = q.roma.toLowerCase();
       targetEl.innerText = q.en;
