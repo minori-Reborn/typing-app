@@ -52,14 +52,17 @@
       background: var(--rainbow-grad);
     }
 
-    /* レインボータイトルの文字 */
+    /* レインボータイトルの文字＆白背景ボックス */
     h1 {
-      font-size: 32px;
-      margin: 0 0 16px 0;
-      background: linear-gradient(45deg, #ff758c, #ff7eb3, #764ba2, #6b11ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+      font-size: 26px;
+      margin: 0 auto 16px auto;
+      padding: 8px 24px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 50px;
+      display: inline-block;
+      color: #ec4899;
+      box-shadow: 0 4px 12px rgba(244, 114, 182, 0.2);
+      border: 2px solid #fbcfe8;
     }
 
     .mode-select {
@@ -380,7 +383,6 @@
     }, 1500);
   }
 
-  /* パステルレインボーな紙ふぶき 🎉 */
   function fireConfetti() {
     confetti({
       particleCount: 50,
