@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ゆめかわ えいご タイピング</title>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #fce4ec;
+      --card-bg: #ffffffd0;
+      --primary: #ff80ab;
+      --accent: #7c4dff;
+      --text: #4a148c;
+    }
+    body {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      background: linear-gradient(135deg, #ffe6f0 0%, #e8eaf6 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+    }
+    .container {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 30px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 10px 25px rgba(255, 128, 171, 0.2);
+      border: 4px solid #fff;
+      text-align: center;
+    }
+    h1 {
+      color: var(--primary);
+      font-size: 28px;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 0px #fff;
+    }
+    .mode-select {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .btn {
+      background: #fff;
+      border: 3px solid var(--primary);
+      color: var(--primary);
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+    .btn.active, .btn:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: scale(1.05);
+    }
+    .score-board {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #ab47bc;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      position: relative;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .japanese {
+      font-size: 24px;
+      color: #5c6bc0;
+      margin-bottom: 5px;
+    }
+    .target-word {
+      font-size: 40px;
+      letter-spacing: 4px;
+      font-weight: bold;
+      color: var(--accent);
+      min-height: 50px;
+      transition: opacity 0.5s;
+    }
+    .target-word.hidden {
+      opacity: 0;
+    }
+    .hint-msg {
+      font-size: 18px;
+      color: #ff4081;
+      font-weight: bold;
+      min-height: 24px;
+      margin-top: 5px;
+    }
+    .action-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .icon-btn {
+      background: #e1bee7;
+      border: none;
+      border-radius: 50px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: 0 3px 0 #ba68c8;
+    }
+    .icon-btn:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+    .input-display {
+      font-size: 32px;
+      letter-spacing: 3px;
+      color: #26a69a;
+      min-height: 40px;
+      border-bottom: 3px dashed var(--primary);
+      margin-bottom: 20px;
+      display: inline-block;
+      padding: 0 10px;
+    }
+    /* ミスした時にぷるぷる揺れる */
+    .shake {
+      animation: shake 0.3s ease-in-out;
+      color: #ff5252 !important;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-10px); }
+      80% { transform: translateX(10px); }
+      100% { transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>✨ ゆめかわ タイピング ✨</h1>
+
+  <div class="mode-select">
+    <button class="btn active" id="btn-spell" onclick="setMode('spell')">🧠 えいご おぼえ</button>
+    <button class="btn" id="btn-roma" onclick="setMode('roma')">✏️ ローマじ</button>
+  </div>
+
+  <div class="score-board">
+    ⭐ すこあ: <span id="score">0</span> てん
+  </div>
+
+  <div class="card">
+    <div class="japanese" id="ja-text">にほんご</div>
+    <div class="target-word" id="target-text">apple</div>
+    <div class="hint-msg" id="hint-text"></div>
+    <div class="action-btns">
+      <button class="icon-btn" onclick="speakCurrentWord()">🔊 おと</button>
+      <button class="icon-btn" onclick="showHint()">💡 つぎの１もじ</button>
+    </div>
+  </div>
+
+  <div class="input-display" id="input-text">＿</div>
+</div>
+
+<!-- 単語データを読み込み -->
+<script src="words.js"></script>
+<script>
+  let currentMode = 'spell';
+  let currentWordIndex = 0;
+  let typedText = "";
+  let score = 0;
+  let targetAnswer = "";
+  let hideTimer = null;
+  let hintTimer = null;
+  let missCount = 0; // ミス回数のカウント
+
+  function initGame() {
+    score = 0;
+    document.getElementById('score').innerText = score;
+    currentWordIndex = 0;
+    wordList.sort(() => Math.random() - 0.5);
+    nextQuestion();
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('btn-spell').classList.toggle('active', mode === 'spell');
+    document.getElementById('btn-roma').classList.toggle('active', mode === 'roma');
+    initGame();
+  }
+
+  function nextQuestion() {
+    typedText = "";
+    missCount = 0;
+    document.getElementById('hint-text').innerText = "";
+    updateInputDisplay();
+
+    const q = wordList[currentWordIndex];
+    document.getElementById('ja-text').innerText = `${q.ja} [${q.category}]`;
+
+    const targetEl = document.getElementById('target-text');
+    targetEl.classList.remove('hidden');
+
+    if (currentMode === 'spell') {
+      targetAnswer = q.en;
+      targetEl.innerText = q.en;
+      speak(q.en);
+
+      // 2秒後に文字を隠す
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        targetEl.classList.add('hidden');
+      }, 2000);
+
+    } else {
+      targetAnswer = q.roma;
+      targetEl.innerText = q.roma;
+      speak(q.en);
+    }
+  }
+
+  function showHint() {
+    const nextChar = targetAnswer[typedText.length];
+    if (nextChar) {
+      const hintEl = document.getElementById('hint-text');
+      hintEl.innerText = `つぎは → 「 ${nextChar.toUpperCase()} 」 だよ！`;
+      
+      clearTimeout(hintTimer);
+      hintTimer = setTimeout(() => {
+        hintEl.innerText = "";
+      }, 2000);
+    }
+  }
+
+  // 3回連続ミス時の救済チラ見せ
+  function rescueShow() {
+    const targetEl = document.getElementById('target-text');
+    const hintEl = document.getElementById('hint-text');
+    hintEl.innerText = "ちらっと ちぇっく！";
+    targetEl.classList.remove('hidden');
+
+    setTimeout(() => {
+      if (currentMode === 'spell') {
+        targetEl.classList.add('hidden');
+      }
+      hintEl.innerText = "";
+    }, 1500);
+  }
+
+  function speak(text) {
+    window.speechSynthesis.cancel();
+    const uttr = new SpeechSynthesisUtterance(text);
+    uttr.lang = 'en-US';
+    uttr.rate = 0.8;
+    window.speechSynthesis.speak(uttr);
+  }
+
+  function speakCurrentWord() {
+    const q = wordList[currentWordIndex];
+    speak(q.en);
+  }
+
+  function updateInputDisplay() {
+    document.getElementById('input-text').innerText = typedText || "＿";
+  }
+
+  function shakeInput() {
+    const el = document.getElementById('input-text');
+    el.classList.add('shake');
+    setTimeout(() => el.classList.remove('shake'), 300);
+  }
+
+  // キー入力
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace') {
+      typedText = typedText.slice(0, -1);
+      updateInputDisplay();
+      return;
+    }
+
+    if (e.key.length === 1 && e.key.match(/[a-z\-]/i)) {
+      const nextChar = e.key.toLowerCase();
+      const expectedChar = targetAnswer[typedText.length]?.toLowerCase();
+
+      if (nextChar === expectedChar) {
+        typedText += nextChar;
+        missCount = 0; // 正解したらミス回数リセット
+        document.getElementById('hint-text').innerText = "";
+        updateInputDisplay();
+
+        if (typedText === targetAnswer.toLowerCase()) {
+          score += 10;
+          document.getElementById('score').innerText = score;
+          speak("Great!");
+          currentWordIndex = (currentWordIndex + 1) % wordList.length;
+          setTimeout(nextQuestion, 600);
+        }
+      } else {
+        // 間違えたとき（ぷるぷる揺れる）
+        shakeInput();
+        missCount++;
+
+        // 3回間違えたら救済チラ見せ！
+        if (missCount >= 3) {
+          rescueShow();
+          missCount = 0;
+        }
+      }
+    }
+  });
+
+  window.onload = () => {
+    initGame();
+  };
+</script>
+</body>
+</html>
