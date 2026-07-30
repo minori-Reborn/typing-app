@@ -330,6 +330,7 @@
     missCount = 0;
     document.getElementById('hint-text').innerText = "";
     updateInputDisplay();
+    clearTimeout(hideTimer);
 
     if (filteredList.length === 0) return;
 
@@ -343,12 +344,13 @@
       targetEl.innerText = q.en;
       speak(q.en);
 
-      clearTimeout(hideTimer);
+      // えいご おぼえモードのみ 2秒で非表示
       hideTimer = setTimeout(() => {
         targetEl.classList.add('hidden');
       }, 2000);
 
     } else {
+      // ローマじモード：日本語（意味）非表示 ＆ 単語はずっと表示！
       document.getElementById('ja-text').innerText = "";
       targetAnswer = q.roma.toLowerCase();
       targetEl.innerText = q.en;
