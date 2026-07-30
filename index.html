@@ -8,15 +8,18 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
-      --bg-color: #fce4ec;
-      --card-bg: #ffffffd0;
-      --primary: #ff80ab;
-      --accent: #7c4dff;
-      --text: #4a148c;
+      /* パステルレインボー カラー定義 */
+      --rainbow-grad: linear-gradient(90deg, #ffb3ba, #ffdfba, #ffffba, #baffc9, #bae1ff, #e8baff);
+      --bg-grad: linear-gradient(135deg, #ffe3ec 0%, #e0f2fe 50%, #f3e8ff 100%);
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --primary: #f472b6;
+      --accent: #8b5cf6;
+      --text: #4c1d95;
     }
+    
     body {
       font-family: 'M PLUS Rounded 1c', sans-serif;
-      background: linear-gradient(135deg, #ffe6f0 0%, #e8eaf6 100%);
+      background: var(--bg-grad);
       min-height: 100vh;
       margin: 0;
       display: flex;
@@ -25,45 +28,68 @@
       justify-content: center;
       color: var(--text);
     }
+
+    /* レインボー枠線のカード */
     .container {
       background: var(--card-bg);
-      backdrop-filter: blur(10px);
-      border-radius: 24px;
-      padding: 25px;
+      backdrop-filter: blur(12px);
+      border-radius: 30px;
+      padding: 30px;
       width: 90%;
       max-width: 650px;
-      box-shadow: 0 10px 25px rgba(255, 128, 171, 0.2);
-      border: 4px solid #fff;
-      text-align: center;
+      box-shadow: 0 12px 32px rgba(236, 72, 153, 0.15);
+      border: 6px solid transparent;
+      background-clip: padding-box;
+      position: relative;
     }
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -6px; right: -6px; bottom: -6px; left: -6px;
+      z-index: -1;
+      border-radius: 36px;
+      background: var(--rainbow-grad);
+    }
+
+    /* レインボータイトルの文字 */
     h1 {
-      color: var(--primary);
-      font-size: 28px;
-      margin: 0 0 12px 0;
-      text-shadow: 2px 2px 0px #fff;
+      font-size: 32px;
+      margin: 0 0 16px 0;
+      background: linear-gradient(45deg, #ff758c, #ff7eb3, #764ba2, #6b11ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
     }
+
     .mode-select {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       justify-content: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
+
     .btn {
-      background: #fff;
-      border: 3px solid var(--primary);
-      color: var(--primary);
-      padding: 8px 18px;
+      background: #ffffff;
+      border: 3px solid #f472b6;
+      color: #ec4899;
+      padding: 10px 22px;
       border-radius: 50px;
       font-weight: 900;
       cursor: pointer;
       font-size: 16px;
-      transition: all 0.2s;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
+
     .btn.active, .btn:hover {
-      background: var(--primary);
-      color: #fff;
-      transform: scale(1.05);
+      background: var(--rainbow-grad);
+      color: #5b21b6;
+      border-color: #c084fc;
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 15px rgba(168, 85, 247, 0.25);
     }
+
     .controls {
       margin-bottom: 15px;
       display: flex;
@@ -71,99 +97,118 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      font-size: 14px;
-      color: #7b1fa2;
+      font-size: 15px;
+      color: #6b21a8;
       font-weight: bold;
     }
+
     select {
-      padding: 6px 12px;
-      border-radius: 15px;
-      border: 2px solid var(--primary);
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 3px solid #f472b6;
       font-family: inherit;
-      font-size: 14px;
+      font-size: 15px;
       color: var(--text);
       outline: none;
-      background: #fff;
+      background: #ffffff;
+      cursor: pointer;
     }
+
     .score-board {
-      font-size: 20px;
-      margin-bottom: 12px;
-      color: #ab47bc;
-      font-weight: 900;
-    }
-    .card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 20px;
+      font-size: 22px;
       margin-bottom: 15px;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      color: #9333ea;
+      font-weight: 900;
+      text-shadow: 1px 1px 0px #fff;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: inset 0 0 12px rgba(244, 114, 182, 0.15);
       position: relative;
       min-height: 140px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      border: 2px dashed #fbcfe8;
     }
+
     .japanese {
-      font-size: 26px;
-      color: #5c6bc0;
-      margin-bottom: 5px;
+      font-size: 28px;
+      color: #6366f1;
+      margin-bottom: 6px;
       font-weight: 900;
-      min-height: 38px;
+      min-height: 40px;
     }
+
     .target-word {
-      font-size: 48px;
-      letter-spacing: 4px;
+      font-size: 52px;
+      letter-spacing: 5px;
       font-weight: 900;
-      color: var(--accent);
-      min-height: 60px;
+      color: #8b5cf6;
+      min-height: 65px;
       transition: opacity 0.5s;
     }
+
     .target-word.hidden {
       opacity: 0;
     }
+
     .hint-msg {
       font-size: 18px;
-      color: #ff4081;
+      color: #f43f5e;
       font-weight: 900;
-      min-height: 24px;
-      margin-top: 5px;
+      min-height: 26px;
+      margin-top: 6px;
     }
+
     .action-btns {
       display: flex;
-      gap: 10px;
-      margin-top: 8px;
+      gap: 12px;
+      margin-top: 10px;
     }
+
     .icon-btn {
-      background: #e1bee7;
+      background: linear-gradient(135deg, #fef08a, #fbcfe8, #ddd6fe);
       border: none;
       border-radius: 50px;
-      padding: 8px 16px;
-      font-size: 14px;
+      padding: 10px 20px;
+      font-size: 15px;
       font-weight: 900;
-      color: var(--text);
+      color: #5b21b6;
       cursor: pointer;
-      box-shadow: 0 3px 0 #ba68c8;
+      box-shadow: 0 4px 0 #c084fc;
+      transition: all 0.15s ease;
     }
+
     .icon-btn:active {
-      transform: translateY(3px);
+      transform: translateY(4px);
       box-shadow: none;
     }
+
+    /* レインボーライン付きの入力表示 */
     .input-display {
-      font-size: 40px;
-      letter-spacing: 4px;
+      font-size: 44px;
+      letter-spacing: 5px;
       font-weight: 900;
-      color: #26a69a;
-      min-height: 50px;
-      border-bottom: 4px dashed var(--primary);
+      color: #0d9488;
+      min-height: 55px;
       margin-bottom: 10px;
       display: inline-block;
-      padding: 0 15px;
+      padding: 4px 24px;
+      border-bottom: 5px solid transparent;
+      border-image: var(--rainbow-grad) 1;
     }
+
     .shake {
       animation: shake 0.3s ease-in-out;
-      color: #ff5252 !important;
+      color: #f43f5e !important;
     }
+
     @keyframes shake {
       0% { transform: translateX(0); }
       20% { transform: translateX(-10px); }
@@ -177,7 +222,7 @@
 <body>
 
 <div class="container">
-  <h1>✨ ゆめかわ タイピング ✨</h1>
+  <h1>🌈 ゆめかわ パステル タイピング 🌈</h1>
 
   <div class="mode-select">
     <button class="btn active" id="btn-spell" onclick="setMode('spell')">🧠 えいご おぼえ</button>
@@ -335,12 +380,13 @@
     }, 1500);
   }
 
+  /* パステルレインボーな紙ふぶき 🎉 */
   function fireConfetti() {
     confetti({
-      particleCount: 40,
-      spread: 60,
+      particleCount: 50,
+      spread: 70,
       origin: { y: 0.7 },
-      colors: ['#ff80ab', '#7c4dff', '#80deea', '#ffd54f', '#b388ff']
+      colors: ['#ffb3ba', '#ffdfba', '#ffffba', '#baffc9', '#bae1ff', '#e8baff']
     });
   }
 
