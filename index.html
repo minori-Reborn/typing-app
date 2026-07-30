@@ -109,6 +109,7 @@
       color: #5c6bc0;
       margin-bottom: 5px;
       font-weight: 900;
+      min-height: 38px;
     }
     .target-word {
       font-size: 48px;
@@ -185,7 +186,7 @@
 
   <div class="controls">
     <div>
-      🏷️ ジャンル:
+      🏷️ じゃんる:
       <select id="category-filter" onchange="initGame()">
         <option value="all">★ ぜんぶ ★</option>
         <option value="どうぶつ">どうぶつ</option>
@@ -242,7 +243,6 @@
   function loadVoices() {
     if (!('speechSynthesis' in window)) return;
     const voices = window.speechSynthesis.getVoices();
-    // Samanthaを優先検索、無ければきれいな英語女性声を自動指定
     samanthaVoice = voices.find(v => v.name.includes('Samantha')) ||
                    voices.find(v => v.name.includes('Karen') || v.name.includes('Victoria') || (v.lang.startsWith('en') && v.name.includes('Natural')));
   }
@@ -287,6 +287,7 @@
     targetEl.classList.remove('hidden');
 
     if (currentMode === 'spell') {
+      // えいご おぼえモード：日本語の意味を表示
       document.getElementById('ja-text').innerText = `${q.ja} [${q.category}]`;
       targetAnswer = q.en.toLowerCase();
       targetEl.innerText = q.en;
@@ -298,7 +299,8 @@
       }, 2000);
 
     } else {
-      document.getElementById('ja-text').innerText = `いみ: ${q.ja}`;
+      // ローマじモード：日本語（意味）は完全非表示！単語のみ常時表示
+      document.getElementById('ja-text').innerText = "";
       targetAnswer = q.roma.toLowerCase();
       targetEl.innerText = q.en;
       speak(q.en);
