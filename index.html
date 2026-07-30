@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ゆめかわ えいご タイピング</title>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
+  <!-- 紙吹雪ライブラリ -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
       --bg-color: #fce4ec;
@@ -28,7 +30,7 @@
       background: var(--card-bg);
       backdrop-filter: blur(10px);
       border-radius: 24px;
-      padding: 30px;
+      padding: 25px;
       width: 90%;
       max-width: 600px;
       box-shadow: 0 10px 25px rgba(255, 128, 171, 0.2);
@@ -37,25 +39,25 @@
     }
     h1 {
       color: var(--primary);
-      font-size: 28px;
-      margin-bottom: 10px;
+      font-size: 26px;
+      margin: 0 0 10px 0;
       text-shadow: 2px 2px 0px #fff;
     }
     .mode-select {
       display: flex;
       gap: 10px;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
     .btn {
       background: #fff;
       border: 3px solid var(--primary);
       color: var(--primary);
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 50px;
       font-weight: bold;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 15px;
       transition: all 0.2s;
     }
     .btn.active, .btn:hover {
@@ -63,58 +65,78 @@
       color: #fff;
       transform: scale(1.05);
     }
+    .category-select {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #7b1fa2;
+      font-weight: bold;
+    }
+    select {
+      padding: 6px 12px;
+      border-radius: 15px;
+      border: 2px solid var(--primary);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      background: #fff;
+    }
     .score-board {
       font-size: 18px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       color: #ab47bc;
     }
     .card {
       background: #fff;
       border-radius: 20px;
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
       position: relative;
-      min-height: 140px;
+      min-height: 130px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
     }
     .japanese {
-      font-size: 24px;
+      font-size: 22px;
       color: #5c6bc0;
       margin-bottom: 5px;
     }
     .target-word {
-      font-size: 40px;
-      letter-spacing: 4px;
+      font-size: 38px;
+      letter-spacing: 3px;
       font-weight: bold;
       color: var(--accent);
-      min-height: 50px;
+      min-height: 48px;
       transition: opacity 0.5s;
     }
     .target-word.hidden {
       opacity: 0;
     }
     .hint-msg {
-      font-size: 18px;
+      font-size: 16px;
       color: #ff4081;
       font-weight: bold;
-      min-height: 24px;
+      min-height: 22px;
       margin-top: 5px;
     }
     .action-btns {
       display: flex;
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 8px;
     }
     .icon-btn {
       background: #e1bee7;
       border: none;
       border-radius: 50px;
-      padding: 8px 16px;
-      font-size: 14px;
+      padding: 6px 14px;
+      font-size: 13px;
       font-weight: bold;
       color: var(--text);
       cursor: pointer;
@@ -130,11 +152,10 @@
       color: #26a69a;
       min-height: 40px;
       border-bottom: 3px dashed var(--primary);
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       display: inline-block;
       padding: 0 10px;
     }
-    /* ミスした時にぷるぷる揺れる */
     .shake {
       animation: shake 0.3s ease-in-out;
       color: #ff5252 !important;
@@ -159,6 +180,19 @@
     <button class="btn" id="btn-roma" onclick="setMode('roma')">✏️ ローマじ</button>
   </div>
 
+  <div class="category-select">
+    🏷️ ジャンル:
+    <select id="category-filter" onchange="initGame()">
+      <option value="all">★ ぜんぶ ★</option>
+      <option value="どうぶつ">どうぶつ</option>
+      <option value="いろ">いろ</option>
+      <option value="かたち">かたち</option>
+      <option value="がっこう">がっこう</option>
+      <option value="ばしょ">ばしょ</option>
+      <option value="にちじょう">にちじょう</option>
+    </select>
+  </div>
+
   <div class="score-board">
     ⭐ すこあ: <span id="score">0</span> てん
   </div>
@@ -176,23 +210,32 @@
   <div class="input-display" id="input-text">＿</div>
 </div>
 
-<!-- 単語データを読み込み -->
 <script src="words.js"></script>
 <script>
   let currentMode = 'spell';
   let currentWordIndex = 0;
+  let filteredList = [];
   let typedText = "";
   let score = 0;
   let targetAnswer = "";
   let hideTimer = null;
   let hintTimer = null;
-  let missCount = 0; // ミス回数のカウント
+  let missCount = 0;
 
   function initGame() {
     score = 0;
     document.getElementById('score').innerText = score;
     currentWordIndex = 0;
-    wordList.sort(() => Math.random() - 0.5);
+
+    // カテゴリフィルター
+    const selectedCat = document.getElementById('category-filter').value;
+    if (selectedCat === 'all') {
+      filteredList = [...wordList];
+    } else {
+      filteredList = wordList.filter(w => w.category === selectedCat);
+    }
+
+    filteredList.sort(() => Math.random() - 0.5);
     nextQuestion();
   }
 
@@ -209,26 +252,29 @@
     document.getElementById('hint-text').innerText = "";
     updateInputDisplay();
 
-    const q = wordList[currentWordIndex];
-    document.getElementById('ja-text').innerText = `${q.ja} [${q.category}]`;
+    if (filteredList.length === 0) return;
 
+    const q = filteredList[currentWordIndex];
     const targetEl = document.getElementById('target-text');
     targetEl.classList.remove('hidden');
 
     if (currentMode === 'spell') {
+      // えいごおぼえモード：日本語ヒントを表示し、英単語を表示後隠す
+      document.getElementById('ja-text').innerText = `${q.ja} [${q.category}]`;
       targetAnswer = q.en;
       targetEl.innerText = q.en;
       speak(q.en);
 
-      // 2秒後に文字を隠す
       clearTimeout(hideTimer);
       hideTimer = setTimeout(() => {
         targetEl.classList.add('hidden');
       }, 2000);
 
     } else {
+      // ローマ字モード：英単語を大きく表示し、意味のひらがなも添える。答えはローマ字(q.roma)
+      document.getElementById('ja-text').innerText = `いみ: ${q.ja}`;
       targetAnswer = q.roma;
-      targetEl.innerText = q.roma;
+      targetEl.innerText = q.en;
       speak(q.en);
     }
   }
@@ -246,7 +292,6 @@
     }
   }
 
-  // 3回連続ミス時の救済チラ見せ
   function rescueShow() {
     const targetEl = document.getElementById('target-text');
     const hintEl = document.getElementById('hint-text');
@@ -261,6 +306,16 @@
     }, 1500);
   }
 
+  function fireConfetti() {
+    // ゆめかわパステルカラーの紙吹雪
+    confetti({
+      particleCount: 40,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#ff80ab', '#7c4dff', '#80deea', '#ffd54f', '#b388ff']
+    });
+  }
+
   function speak(text) {
     window.speechSynthesis.cancel();
     const uttr = new SpeechSynthesisUtterance(text);
@@ -270,7 +325,8 @@
   }
 
   function speakCurrentWord() {
-    const q = wordList[currentWordIndex];
+    if (filteredList.length === 0) return;
+    const q = filteredList[currentWordIndex];
     speak(q.en);
   }
 
@@ -284,7 +340,6 @@
     setTimeout(() => el.classList.remove('shake'), 300);
   }
 
-  // キー入力
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Backspace') {
       typedText = typedText.slice(0, -1);
@@ -298,23 +353,25 @@
 
       if (nextChar === expectedChar) {
         typedText += nextChar;
-        missCount = 0; // 正解したらミス回数リセット
+        missCount = 0;
         document.getElementById('hint-text').innerText = "";
         updateInputDisplay();
 
         if (typedText === targetAnswer.toLowerCase()) {
           score += 10;
           document.getElementById('score').innerText = score;
+          
+          // 紙吹雪を飛ばす！
+          fireConfetti();
           speak("Great!");
-          currentWordIndex = (currentWordIndex + 1) % wordList.length;
-          setTimeout(nextQuestion, 600);
+
+          currentWordIndex = (currentWordIndex + 1) % filteredList.length;
+          setTimeout(nextQuestion, 700);
         }
       } else {
-        // 間違えたとき（ぷるぷる揺れる）
         shakeInput();
         missCount++;
 
-        // 3回間違えたら救済チラ見せ！
         if (missCount >= 3) {
           rescueShow();
           missCount = 0;
