@@ -1,5 +1,5 @@
 const wordList = [
-  // 🐶 どうぶつ
+  // 🐶 どうぶつ・いきもの (12)
   { en: "dog", ja: "いぬ", roma: "inu", category: "どうぶつ" },
   { en: "cat", ja: "ねこ", roma: "neko", category: "どうぶつ" },
   { en: "rabbit", ja: "うさぎ", roma: "usagi", category: "どうぶつ" },
@@ -10,8 +10,10 @@ const wordList = [
   { en: "lion", ja: "らいおん", roma: "raion", category: "どうぶつ" },
   { en: "fish", ja: "さかな", roma: "sakana", category: "どうぶつ" },
   { en: "duck", ja: "あひる", roma: "ahiru", category: "どうぶつ" },
+  { en: "panda", ja: "ぱんだ", roma: "panda", category: "どうぶつ" },
+  { en: "penguin", ja: "ぺんぎん", roma: "pengin", category: "どうぶつ" },
 
-  // 🎨 いろ
+  // 🎨 いろ (8)
   { en: "red", ja: "あか", roma: "aka", category: "いろ" },
   { en: "blue", ja: "あお", roma: "ao", category: "いろ" },
   { en: "yellow", ja: "きいろ", roma: "kiiro", category: "いろ" },
@@ -21,7 +23,7 @@ const wordList = [
   { en: "black", ja: "くろ", roma: "kuro", category: "いろ" },
   { en: "orange", ja: "おれんじ", roma: "orenji", category: "いろ" },
 
-  // 🍎 たべもの（英検によく出る！）
+  // 🍎 たべもの・のみもの (15)
   { en: "apple", ja: "りんご", roma: "ringo", category: "たべもの" },
   { en: "banana", ja: "ばなな", roma: "banana", category: "たべもの" },
   { en: "cake", ja: "けーき", roma: "ke-ki", category: "たべもの" },
@@ -30,8 +32,15 @@ const wordList = [
   { en: "bread", ja: "ぱん", roma: "pan", category: "たべもの" },
   { en: "egg", ja: "たまご", roma: "tamago", category: "たべもの" },
   { en: "rice", ja: "ごはん", roma: "gohan", category: "たべもの" },
+  { en: "pizza", ja: "ぴざ", roma: "piza", category: "たべもの" },
+  { en: "juice", ja: "じゅーす", roma: "ju-su", category: "たべもの" },
+  { en: "tea", ja: "おちゃ", roma: "ocha", category: "たべもの" },
+  { en: "meat", ja: "にく", roma: "niku", category: "たべもの" },
+  { en: "fish", ja: "さかな", roma: "sakana", category: "たべもの" },
+  { en: "peach", ja: "もも", roma: "momo", category: "たべもの" },
+  { en: "lemon", ja: "れもん", roma: "remon", category: "たべもの" },
 
-  // 🏫 がっこう
+  // 🏫 がっこう・べんきょう (15)
   { en: "pen", ja: "ぺん", roma: "pen", category: "がっこう" },
   { en: "desk", ja: "つくえ", roma: "tsukue", category: "がっこう" },
   { en: "book", ja: "ほん", roma: "hon", category: "がっこう" },
@@ -39,19 +48,70 @@ const wordList = [
   { en: "music", ja: "おんがく", roma: "ongaku", category: "がっこう" },
   { en: "math", ja: "さんすう", roma: "sansuu", category: "がっこう" },
   { en: "room", ja: "へや", roma: "heya", category: "がっこう" },
+  { en: "pencil", ja: "えんぴつ", roma: "enpitsu", category: "がっこう" },
+  { en: "chair", ja: "いす", roma: "isu", category: "がっこう" },
+  { en: "class", ja: "くらす", roma: "kurasu", category: "がっこう" },
+  { en: "school", ja: "がっこう", roma: "gakkou", category: "がっこう" },
+  { en: "teacher", ja: "せんせい", roma: "sensei", category: "がっこう" },
+  { en: "friend", ja: "ともだち", roma: "tomodachi", category: "がっこう" },
+  { en: "paper", ja: "かみ", roma: "kami", category: "がっこう" },
+  { en: "box", ja: "はこ", roma: "hako", category: "がっこう" },
 
-  // 🏠 ばしょ＆かぞく
+  // 🏠 かぞく・ばしょ (10)
   { en: "park", ja: "こうえん", roma: "kouen", category: "ばしょ" },
   { en: "shop", ja: "みせ", roma: "mise", category: "ばしょ" },
   { en: "home", ja: "いえ", roma: "ie", category: "ばしょ" },
   { en: "mother", ja: "おかあさん", roma: "okaasan", category: "ばしょ" },
   { en: "father", ja: "おとうさん", roma: "otousan", category: "ばしょ" },
+  { en: "sister", ja: "おねえさん・いもうと", roma: "oneesan", category: "ばしょ" },
+  { en: "brother", ja: "おにいさん・おとうと", roma: "oniisan", category: "ばしょ" },
+  { en: "town", ja: "まち", roma: "machi", category: "ばしょ" },
+  { en: "zoo", ja: "どうぶつえん", roma: "doubutsuen", category: "ばしょ" },
+  { en: "station", ja: "えき", roma: "eki", category: "ばしょ" },
 
-  // ☀️ にちじょう＆きせつ
+  // 🚗 のりもの (8)
+  { en: "car", ja: "くるま", roma: "kuruma", category: "のりもの" },
+  { en: "bus", ja: "ばす", roma: "basu", category: "のりもの" },
+  { en: "train", ja: "でんしゃ", roma: "densha", category: "のりもの" },
+  { en: "plane", ja: "ひこうき", roma: "hikouki", category: "のりもの" },
+  { en: "bike", ja: "じてんしゃ", roma: "jitensha", category: "のりもの" },
+  { en: "ship", ja: "ふね", roma: "fune", category: "のりもの" },
+  { en: "taxi", ja: "たくしー", roma: "takushi-", category: "のりもの" },
+  { en: "truck", ja: "とらっく", roma: "torakku", category: "のりもの" },
+
+  // ⚽️ すぽーつ・あそび (8)
+  { en: "soccer", ja: "さっかー", roma: "sakka-", category: "すぽーつ" },
+  { en: "tennis", ja: "てにす", roma: "tenisu", category: "すぽーつ" },
+  { en: "swim", ja: "すいえい", roma: "suiei", category: "すぽーつ" },
+  { en: "game", ja: "げーむ", roma: "ge-mu", category: "すぽーつ" },
+  { en: "song", ja: "うた", roma: "uta", category: "すぽーつ" },
+  { en: "piano", ja: "ぴあの", roma: "piano", category: "すぽーつ" },
+  { en: "run", ja: "はしる", roma: "hashiru", category: "すぽーつ" },
+  { en: "dance", ja: "だんす", roma: "dansu", category: "すぽーつ" },
+
+  // 👗 きるもの・からだ (10)
+  { en: "shirt", ja: "しゃつ", roma: "shatsu", category: "きるもの" },
+  { en: "shoes", ja: "くつ", roma: "kutsu", category: "きるもの" },
+  { en: "hat", ja: "ぼうし", roma: "boushi", category: "きるもの" },
+  { en: "cap", ja: "きゃっぷ", roma: "kyappu", category: "きるもの" },
+  { en: "coat", ja: "こーと", roma: "ko-to", category: "きるもの" },
+  { en: "hand", ja: "て", roma: "te", category: "きるもの" },
+  { en: "head", ja: "あたま", roma: "atama", category: "きるもの" },
+  { en: "face", ja: "かお", roma: "kao", category: "きるもの" },
+  { en: "eye", ja: "め", roma: "me", category: "きるもの" },
+  { en: "ear", ja: "みみ", roma: "mimi", category: "きるもの" },
+
+  // ☀️ にちじょう・てんき・じかん (12)
   { en: "sun", ja: "たいよう", roma: "taiyou", category: "にちじょう" },
   { en: "rain", ja: "あめ", roma: "ame", category: "にちじょう" },
+  { en: "snow", ja: "ゆき", roma: "yuki", category: "にちじょう" },
   { en: "spring", ja: "はる", roma: "haru", category: "にちじょう" },
   { en: "summer", ja: "なつ", roma: "natsu", category: "にちじょう" },
   { en: "fall", ja: "あき", roma: "aki", category: "にちじょう" },
-  { en: "winter", ja: "ふゆ", roma: "fuyu", category: "にちじょう" }
+  { en: "winter", ja: "ふゆ", roma: "fuyu", category: "にちじょう" },
+  { en: "day", ja: "ひ・いちにち", roma: "hi", category: "にちじょう" },
+  { en: "night", ja: "よる", roma: "yoru", category: "にちじょう" },
+  { en: "time", ja: "じかん", roma: "jikan", category: "にちじょう" },
+  { en: "year", ja: "とし", roma: "toshi", category: "にちじょう" },
+  { en: "today", ja: "きょう", roma: "kyou", category: "にちじょう" }
 ];
