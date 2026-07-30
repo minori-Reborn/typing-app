@@ -110,7 +110,6 @@
       margin-bottom: 5px;
       font-weight: 900;
     }
-    /* 英単語の文字を大きく・太字に調整 */
     .target-word {
       font-size: 48px;
       letter-spacing: 4px;
@@ -149,7 +148,6 @@
       transform: translateY(3px);
       box-shadow: none;
     }
-    /* 入力テキストも大きく・見やすく */
     .input-display {
       font-size: 40px;
       letter-spacing: 4px;
@@ -198,13 +196,6 @@
         <option value="にちじょう">にちじょう</option>
       </select>
     </div>
-
-    <div>
-      🗣️ こえ:
-      <select id="voice-select" onchange="speakCurrentWord()">
-        <option value="">(じどう) おまかせ</option>
-      </select>
-    </div>
   </div>
 
   <div class="score-board">
@@ -235,9 +226,8 @@
   let hideTimer = null;
   let hintTimer = null;
   let missCount = 0;
-  let availableVoices = [];
+  let samanthaVoice = null;
 
-  // ローマ字の揺れ吸収テーブル
   const ROMA_VARIANTS = {
     'si': ['shi'], 'shi': ['si'],
     'zi': ['ji'], 'ji': ['zi'],
@@ -251,17 +241,10 @@
 
   function loadVoices() {
     if (!('speechSynthesis' in window)) return;
-    
-    availableVoices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
-    const voiceSelect = document.getElementById('voice-select');
-    voiceSelect.innerHTML = '<option value="">(じどう) おまかせ</option>';
-    
-    availableVoices.forEach((v, index) => {
-      const option = document.createElement('option');
-      option.value = index;
-      option.innerText = `${v.name.replace(/Google|Microsoft|Apple/g, '').trim()} (${v.lang})`;
-      voiceSelect.appendChild(option);
-    });
+    const voices = window.speechSynthesis.getVoices();
+    // Samanthaを優先検索、無ければきれいな英語女性声を自動指定
+    samanthaVoice = voices.find(v => v.name.includes('Samantha')) ||
+                   voices.find(v => v.name.includes('Karen') || v.name.includes('Victoria') || (v.lang.startsWith('en') && v.name.includes('Natural')));
   }
 
   if ('speechSynthesis' in window) {
@@ -368,23 +351,9 @@
     uttr.rate = 0.85; 
     uttr.pitch = 1.1;
 
-    const selectedVoiceIndex = document.getElementById('voice-select').value;
-    if (selectedVoiceIndex !== "" && availableVoices[selectedVoiceIndex]) {
-      uttr.voice = availableVoices[selectedVoiceIndex];
-    } else {
-      const preferred = availableVoices.find(v => 
-        v.name.includes('Samantha') || 
-        v.name.includes('Karen') || 
-        v.name.includes('Victoria') ||
-        v.name.includes('Natural') ||
-        v.name.includes('Google US English')
-      );
-      if (preferred) uttr.voice = preferred;
+    if (samanthaVoice) {
+      uttr.voice = samanthaVoice;
     }
-
-    uttr.onerror = (e) => {
-      console.log('Speech error:', e);
-    };
 
     window.speechSynthesis.speak(uttr);
   }
@@ -405,11 +374,9 @@
     setTimeout(() => el.classList.remove('shake'), 300);
   }
 
-  // 入力された文字列が目標（ローマ字）の前半と合致するか判定する関数
   function isValidPrefix(input, target) {
     if (target.startsWith(input)) return true;
 
-    // ローマ字モード時の表記ゆれ（shi/si等）判定
     if (currentMode === 'roma') {
       let normInput = input;
       let normTarget = target;
@@ -425,7 +392,7 @@
   }
 
   document.addEventListener('click', () => {
-    if (availableVoices.length === 0) {
+    if (!samanthaVoice) {
       loadVoices();
     }
   }, { once: true });
@@ -437,7 +404,6 @@
       return;
     }
 
-    // 1文字のアルファベットまたはハイフン（大文字も自動で小文字として許容）
     if (e.key.length === 1 && e.key.match(/[a-z\-]/i)) {
       const nextChar = e.key.toLowerCase();
       const testText = typedText + nextChar;
@@ -448,7 +414,6 @@
         document.getElementById('hint-text').innerText = "";
         updateInputDisplay();
 
-        // 正解判定
         let isComplete = (typedText === targetAnswer);
         if (currentMode === 'roma') {
           let normInput = typedText;
