@@ -191,9 +191,12 @@
         <option value="all">★ ぜんぶ ★</option>
         <option value="どうぶつ">どうぶつ</option>
         <option value="いろ">いろ</option>
-        <option value="かたち">かたち</option>
+        <option value="たべもの">たべもの</option>
         <option value="がっこう">がっこう</option>
         <option value="ばしょ">ばしょ</option>
+        <option value="のりもの">のりもの</option>
+        <option value="すぽーつ">すぽーつ</option>
+        <option value="きるもの">きるもの</option>
         <option value="にちじょう">にちじょう</option>
       </select>
     </div>
@@ -287,7 +290,6 @@
     targetEl.classList.remove('hidden');
 
     if (currentMode === 'spell') {
-      // えいご おぼえモード：日本語の意味を表示
       document.getElementById('ja-text').innerText = `${q.ja} [${q.category}]`;
       targetAnswer = q.en.toLowerCase();
       targetEl.innerText = q.en;
@@ -299,7 +301,6 @@
       }, 2000);
 
     } else {
-      // ローマじモード：日本語（意味）は完全非表示！単語のみ常時表示
       document.getElementById('ja-text').innerText = "";
       targetAnswer = q.roma.toLowerCase();
       targetEl.innerText = q.en;
