@@ -232,8 +232,9 @@
   let missCount = 0;
   let availableVoices = [];
 
-  // 利用可能な音声一覧を取得してセレクトボックスに追加
   function loadVoices() {
+    if (!('speechSynthesis' in window)) return;
+    
     availableVoices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
     const voiceSelect = document.getElementById('voice-select');
     voiceSelect.innerHTML = '<option value="">(じどう) おまかせ</option>';
@@ -246,7 +247,9 @@
     });
   }
 
-  window.speechSynthesis.onvoiceschanged = loadVoices;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
 
   function initGame() {
     score = 0;
@@ -339,17 +342,19 @@
   }
 
   function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    
     window.speechSynthesis.cancel();
+    
     const uttr = new SpeechSynthesisUtterance(text);
     uttr.lang = 'en-US';
-    uttr.rate = 0.85; // 少し自然な速度
+    uttr.rate = 0.85; 
+    uttr.pitch = 1.1; // 明るめの可愛いトーンに調整
 
-    // 声が選択されている場合はそれを使用
     const selectedVoiceIndex = document.getElementById('voice-select').value;
     if (selectedVoiceIndex !== "" && availableVoices[selectedVoiceIndex]) {
       uttr.voice = availableVoices[selectedVoiceIndex];
     } else {
-      // 自然な声を自動選択（Samantha, Karen, Google US Englishなど）
       const preferred = availableVoices.find(v => 
         v.name.includes('Samantha') || 
         v.name.includes('Karen') || 
@@ -359,6 +364,11 @@
       );
       if (preferred) uttr.voice = preferred;
     }
+
+    // エラーハンドリング
+    uttr.onerror = (e) => {
+      console.log('Speech error:', e);
+    };
 
     window.speechSynthesis.speak(uttr);
   }
@@ -378,6 +388,13 @@
     el.classList.add('shake');
     setTimeout(() => el.classList.remove('shake'), 300);
   }
+
+  // 画面のどこかをクリックしたら音声リストを強制取得（自動再生制限の対策）
+  document.addEventListener('click', () => {
+    if (availableVoices.length === 0) {
+      loadVoices();
+    }
+  }, { once: true });
 
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Backspace') {
