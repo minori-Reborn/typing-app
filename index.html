@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ゆめかわ えいご タイピング</title>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
-  <!-- 紙吹雪ライブラリ -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
@@ -65,22 +64,23 @@
       color: #fff;
       transform: scale(1.05);
     }
-    .category-select {
+    .controls {
       margin-bottom: 15px;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      font-size: 14px;
+      gap: 12px;
+      font-size: 13px;
       color: #7b1fa2;
       font-weight: bold;
     }
     select {
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 15px;
       border: 2px solid var(--primary);
       font-family: inherit;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text);
       outline: none;
       background: #fff;
@@ -180,17 +180,26 @@
     <button class="btn" id="btn-roma" onclick="setMode('roma')">✏️ ローマじ</button>
   </div>
 
-  <div class="category-select">
-    🏷️ ジャンル:
-    <select id="category-filter" onchange="initGame()">
-      <option value="all">★ ぜんぶ ★</option>
-      <option value="どうぶつ">どうぶつ</option>
-      <option value="いろ">いろ</option>
-      <option value="かたち">かたち</option>
-      <option value="がっこう">がっこう</option>
-      <option value="ばしょ">ばしょ</option>
-      <option value="にちじょう">にちじょう</option>
-    </select>
+  <div class="controls">
+    <div>
+      🏷️ ジャンル:
+      <select id="category-filter" onchange="initGame()">
+        <option value="all">★ ぜんぶ ★</option>
+        <option value="どうぶつ">どうぶつ</option>
+        <option value="いろ">いろ</option>
+        <option value="かたち">かたち</option>
+        <option value="がっこう">がっこう</option>
+        <option value="ばしょ">ばしょ</option>
+        <option value="にちじょう">にちじょう</option>
+      </select>
+    </div>
+
+    <div>
+      🗣️ こえ:
+      <select id="voice-select" onchange="speakCurrentWord()">
+        <option value="">(じどう) おまかせ</option>
+      </select>
+    </div>
   </div>
 
   <div class="score-board">
@@ -221,13 +230,29 @@
   let hideTimer = null;
   let hintTimer = null;
   let missCount = 0;
+  let availableVoices = [];
+
+  // 利用可能な音声一覧を取得してセレクトボックスに追加
+  function loadVoices() {
+    availableVoices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+    const voiceSelect = document.getElementById('voice-select');
+    voiceSelect.innerHTML = '<option value="">(じどう) おまかせ</option>';
+    
+    availableVoices.forEach((v, index) => {
+      const option = document.createElement('option');
+      option.value = index;
+      option.innerText = `${v.name.replace(/Google|Microsoft|Apple/g, '').trim()} (${v.lang})`;
+      voiceSelect.appendChild(option);
+    });
+  }
+
+  window.speechSynthesis.onvoiceschanged = loadVoices;
 
   function initGame() {
     score = 0;
     document.getElementById('score').innerText = score;
     currentWordIndex = 0;
 
-    // カテゴリフィルター
     const selectedCat = document.getElementById('category-filter').value;
     if (selectedCat === 'all') {
       filteredList = [...wordList];
@@ -259,7 +284,6 @@
     targetEl.classList.remove('hidden');
 
     if (currentMode === 'spell') {
-      // えいごおぼえモード：日本語ヒントを表示し、英単語を表示後隠す
       document.getElementById('ja-text').innerText = `${q.ja} [${q.category}]`;
       targetAnswer = q.en;
       targetEl.innerText = q.en;
@@ -271,7 +295,6 @@
       }, 2000);
 
     } else {
-      // ローマ字モード：英単語を大きく表示し、意味のひらがなも添える。答えはローマ字(q.roma)
       document.getElementById('ja-text').innerText = `いみ: ${q.ja}`;
       targetAnswer = q.roma;
       targetEl.innerText = q.en;
@@ -307,7 +330,6 @@
   }
 
   function fireConfetti() {
-    // ゆめかわパステルカラーの紙吹雪
     confetti({
       particleCount: 40,
       spread: 60,
@@ -320,7 +342,24 @@
     window.speechSynthesis.cancel();
     const uttr = new SpeechSynthesisUtterance(text);
     uttr.lang = 'en-US';
-    uttr.rate = 0.8;
+    uttr.rate = 0.85; // 少し自然な速度
+
+    // 声が選択されている場合はそれを使用
+    const selectedVoiceIndex = document.getElementById('voice-select').value;
+    if (selectedVoiceIndex !== "" && availableVoices[selectedVoiceIndex]) {
+      uttr.voice = availableVoices[selectedVoiceIndex];
+    } else {
+      // 自然な声を自動選択（Samantha, Karen, Google US Englishなど）
+      const preferred = availableVoices.find(v => 
+        v.name.includes('Samantha') || 
+        v.name.includes('Karen') || 
+        v.name.includes('Victoria') ||
+        v.name.includes('Natural') ||
+        v.name.includes('Google US English')
+      );
+      if (preferred) uttr.voice = preferred;
+    }
+
     window.speechSynthesis.speak(uttr);
   }
 
@@ -361,7 +400,6 @@
           score += 10;
           document.getElementById('score').innerText = score;
           
-          // 紙吹雪を飛ばす！
           fireConfetti();
           speak("Great!");
 
@@ -381,6 +419,7 @@
   });
 
   window.onload = () => {
+    loadVoices();
     initGame();
   };
 </script>
