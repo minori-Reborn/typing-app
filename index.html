@@ -171,21 +171,29 @@
 
     .action-btns {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .icon-btn {
       background: linear-gradient(135deg, #fef08a, #fbcfe8, #ddd6fe);
       border: none;
       border-radius: 50px;
-      padding: 10px 20px;
-      font-size: 15px;
+      padding: 8px 18px;
+      font-size: 14px;
       font-weight: 900;
       color: #5b21b6;
       cursor: pointer;
       box-shadow: 0 4px 0 #c084fc;
       transition: all 0.15s ease;
+    }
+
+    .icon-btn.reset-btn {
+      background: linear-gradient(135deg, #ffcdd2, #f8bbd0, #e1bee7);
+      color: #880e4f;
+      box-shadow: 0 4px 0 #f48fb1;
     }
 
     .icon-btn:active {
@@ -261,6 +269,7 @@
     <div class="action-btns">
       <button class="icon-btn" onclick="speakCurrentWord()">🔊 おと</button>
       <button class="icon-btn" onclick="showHint()">💡 つぎの１もじ</button>
+      <button class="icon-btn reset-btn" onclick="initGame()">🔄 りせっと</button>
     </div>
   </div>
 
@@ -331,7 +340,6 @@
     document.getElementById('hint-text').innerText = "";
     updateInputDisplay();
 
-    // 動いているタイマーを完全に止める
     if (hideTimer) {
       clearTimeout(hideTimer);
       hideTimer = null;
@@ -342,7 +350,6 @@
     const q = filteredList[currentWordIndex];
     const targetEl = document.getElementById('target-text');
     
-    // 表示状態を強制リセット（必ず可視化）
     targetEl.classList.remove('hidden');
 
     if (currentMode === 'spell') {
@@ -351,13 +358,11 @@
       targetEl.innerText = q.en;
       speak(q.en);
 
-      // えいご おぼえモードの時だけ 2秒後に隠す
       hideTimer = setTimeout(() => {
         targetEl.classList.add('hidden');
       }, 2000);
 
     } else {
-      // ローマじモード：日本語は非表示＆単語は「消さずにずっと表示」！
       document.getElementById('ja-text').innerText = "";
       targetAnswer = q.roma.toLowerCase();
       targetEl.innerText = q.en;
