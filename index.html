@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ゆめかわ えいご タイピング</title>
-  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700,900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
@@ -31,15 +31,15 @@
       border-radius: 24px;
       padding: 25px;
       width: 90%;
-      max-width: 600px;
+      max-width: 650px;
       box-shadow: 0 10px 25px rgba(255, 128, 171, 0.2);
       border: 4px solid #fff;
       text-align: center;
     }
     h1 {
       color: var(--primary);
-      font-size: 26px;
-      margin: 0 0 10px 0;
+      font-size: 28px;
+      margin: 0 0 12px 0;
       text-shadow: 2px 2px 0px #fff;
     }
     .mode-select {
@@ -52,11 +52,11 @@
       background: #fff;
       border: 3px solid var(--primary);
       color: var(--primary);
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 50px;
-      font-weight: bold;
+      font-weight: 900;
       cursor: pointer;
-      font-size: 15px;
+      font-size: 16px;
       transition: all 0.2s;
     }
     .btn.active, .btn:hover {
@@ -71,24 +71,25 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      font-size: 13px;
+      font-size: 14px;
       color: #7b1fa2;
       font-weight: bold;
     }
     select {
-      padding: 5px 10px;
+      padding: 6px 12px;
       border-radius: 15px;
       border: 2px solid var(--primary);
       font-family: inherit;
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text);
       outline: none;
       background: #fff;
     }
     .score-board {
-      font-size: 18px;
+      font-size: 20px;
       margin-bottom: 12px;
       color: #ab47bc;
+      font-weight: 900;
     }
     .card {
       background: #fff;
@@ -97,33 +98,35 @@
       margin-bottom: 15px;
       box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
       position: relative;
-      min-height: 130px;
+      min-height: 140px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
     }
     .japanese {
-      font-size: 22px;
+      font-size: 26px;
       color: #5c6bc0;
       margin-bottom: 5px;
+      font-weight: 900;
     }
+    /* 英単語の文字を大きく・太字に調整 */
     .target-word {
-      font-size: 38px;
-      letter-spacing: 3px;
-      font-weight: bold;
+      font-size: 48px;
+      letter-spacing: 4px;
+      font-weight: 900;
       color: var(--accent);
-      min-height: 48px;
+      min-height: 60px;
       transition: opacity 0.5s;
     }
     .target-word.hidden {
       opacity: 0;
     }
     .hint-msg {
-      font-size: 16px;
+      font-size: 18px;
       color: #ff4081;
-      font-weight: bold;
-      min-height: 22px;
+      font-weight: 900;
+      min-height: 24px;
       margin-top: 5px;
     }
     .action-btns {
@@ -135,9 +138,9 @@
       background: #e1bee7;
       border: none;
       border-radius: 50px;
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: bold;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 900;
       color: var(--text);
       cursor: pointer;
       box-shadow: 0 3px 0 #ba68c8;
@@ -146,15 +149,17 @@
       transform: translateY(3px);
       box-shadow: none;
     }
+    /* 入力テキストも大きく・見やすく */
     .input-display {
-      font-size: 32px;
-      letter-spacing: 3px;
+      font-size: 40px;
+      letter-spacing: 4px;
+      font-weight: 900;
       color: #26a69a;
-      min-height: 40px;
-      border-bottom: 3px dashed var(--primary);
+      min-height: 50px;
+      border-bottom: 4px dashed var(--primary);
       margin-bottom: 10px;
       display: inline-block;
-      padding: 0 10px;
+      padding: 0 15px;
     }
     .shake {
       animation: shake 0.3s ease-in-out;
@@ -232,6 +237,18 @@
   let missCount = 0;
   let availableVoices = [];
 
+  // ローマ字の揺れ吸収テーブル
+  const ROMA_VARIANTS = {
+    'si': ['shi'], 'shi': ['si'],
+    'zi': ['ji'], 'ji': ['zi'],
+    'ti': ['chi'], 'chi': ['ti'],
+    'tu': ['tsu'], 'tsu': ['tu'],
+    'hu': ['fu'], 'fu': ['hu'],
+    'sy': ['sh'], 'sh': ['sy'],
+    'ty': ['ch'], 'ch': ['ty'],
+    'jy': ['j'], 'j': ['jy']
+  };
+
   function loadVoices() {
     if (!('speechSynthesis' in window)) return;
     
@@ -288,7 +305,7 @@
 
     if (currentMode === 'spell') {
       document.getElementById('ja-text').innerText = `${q.ja} [${q.category}]`;
-      targetAnswer = q.en;
+      targetAnswer = q.en.toLowerCase();
       targetEl.innerText = q.en;
       speak(q.en);
 
@@ -299,7 +316,7 @@
 
     } else {
       document.getElementById('ja-text').innerText = `いみ: ${q.ja}`;
-      targetAnswer = q.roma;
+      targetAnswer = q.roma.toLowerCase();
       targetEl.innerText = q.en;
       speak(q.en);
     }
@@ -349,7 +366,7 @@
     const uttr = new SpeechSynthesisUtterance(text);
     uttr.lang = 'en-US';
     uttr.rate = 0.85; 
-    uttr.pitch = 1.1; // 明るめの可愛いトーンに調整
+    uttr.pitch = 1.1;
 
     const selectedVoiceIndex = document.getElementById('voice-select').value;
     if (selectedVoiceIndex !== "" && availableVoices[selectedVoiceIndex]) {
@@ -365,7 +382,6 @@
       if (preferred) uttr.voice = preferred;
     }
 
-    // エラーハンドリング
     uttr.onerror = (e) => {
       console.log('Speech error:', e);
     };
@@ -389,7 +405,25 @@
     setTimeout(() => el.classList.remove('shake'), 300);
   }
 
-  // 画面のどこかをクリックしたら音声リストを強制取得（自動再生制限の対策）
+  // 入力された文字列が目標（ローマ字）の前半と合致するか判定する関数
+  function isValidPrefix(input, target) {
+    if (target.startsWith(input)) return true;
+
+    // ローマ字モード時の表記ゆれ（shi/si等）判定
+    if (currentMode === 'roma') {
+      let normInput = input;
+      let normTarget = target;
+      for (const [key, valList] of Object.entries(ROMA_VARIANTS)) {
+        valList.forEach(v => {
+          normInput = normInput.replace(v, key);
+          normTarget = normTarget.replace(v, key);
+        });
+      }
+      if (normTarget.startsWith(normInput)) return true;
+    }
+    return false;
+  }
+
   document.addEventListener('click', () => {
     if (availableVoices.length === 0) {
       loadVoices();
@@ -403,17 +437,32 @@
       return;
     }
 
+    // 1文字のアルファベットまたはハイフン（大文字も自動で小文字として許容）
     if (e.key.length === 1 && e.key.match(/[a-z\-]/i)) {
       const nextChar = e.key.toLowerCase();
-      const expectedChar = targetAnswer[typedText.length]?.toLowerCase();
+      const testText = typedText + nextChar;
 
-      if (nextChar === expectedChar) {
-        typedText += nextChar;
+      if (isValidPrefix(testText, targetAnswer)) {
+        typedText = testText;
         missCount = 0;
         document.getElementById('hint-text').innerText = "";
         updateInputDisplay();
 
-        if (typedText === targetAnswer.toLowerCase()) {
+        // 正解判定
+        let isComplete = (typedText === targetAnswer);
+        if (currentMode === 'roma') {
+          let normInput = typedText;
+          let normTarget = targetAnswer;
+          for (const [key, valList] of Object.entries(ROMA_VARIANTS)) {
+            valList.forEach(v => {
+              normInput = normInput.replace(v, key);
+              normTarget = normTarget.replace(v, key);
+            });
+          }
+          if (normInput === normTarget) isComplete = true;
+        }
+
+        if (isComplete) {
           score += 10;
           document.getElementById('score').innerText = score;
           
